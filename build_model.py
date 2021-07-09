@@ -16,7 +16,7 @@ def build_model(inputs, outputs, image_size, z_mean, z_log_var, vae, use_mse):
     vae_loss = K.mean(reconstruction_loss + kl_loss)
     vae.add_loss(vae_loss)
 
-    vae.compile(optimizer='rmsprop')
+    vae.compile(optimizer='adam')
     vae.summary()
 
     return vae

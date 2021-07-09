@@ -18,6 +18,8 @@ if __name__ == '__main__':
         description="parameters to set for VAE model")
     parser.add_argument("--latent-dim", type=int, default=2,
                         help="latent dimension size")
+    parser.add_argument("--nb-layers", type=int, default=2,
+                        help="nb convolutional layers")
     parser.add_argument("--batch-size", type=int, default=32,
                         help="nb batch size")
     parser.add_argument("--nb-epochs", type=int, default=20,
@@ -33,6 +35,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     batch_size = args.batch_size
+    nb_layers = args.nb_layers
     kernel_size = args.kernel_size
     filters = args.filter_size
     latent_dim = args.latent_dim
@@ -45,8 +48,8 @@ if __name__ == '__main__':
     Path(cwd).mkdir()
 
     input_shape = (image_size, image_size, 1)
-    inputs, outputs, encoder, decoder, vae, z_mean, z_log_var = create_model(input_shape, filters, kernel_size, latent_dim)
+    inputs, outputs, encoder, decoder, vae, z_mean, z_log_var = create_model(input_shape, filters, kernel_size, latent_dim, nb_layers)
     vae = build_model(inputs, outputs, image_size, z_mean, z_log_var, vae, use_mse)
     fit_model(x_train, x_test, nb_epochs, batch_size, vae, load_weights, cwd)
     plot_results(encoder, decoder, vae, x_test, y_test, batch_size, cwd)
-    generate_report(encoder, decoder, vae, batch_size, kernel_size, filters, latent_dim, nb_epochs, use_mse, load_weights, cwd)
+    generate_report(encoder, decoder, vae, batch_size, kernel_size, filters, latent_dim, nb_epochs, use_mse, load_weights, nb_layers, cwd)

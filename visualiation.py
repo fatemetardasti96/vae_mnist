@@ -18,14 +18,14 @@ def plot_results(encoder, decoder, vae, x_test, y_test, batch_size, cwd):
     plt.figure(figsize=(35,5))
     for i in range(n):
         ax = plt.subplot(2, n, i+1)
-        plt.title("test images")
+        # plt.title("test images")
         plt.imshow(x_test[i][:,:,0])
         plt.gray()
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
 
         ax = plt.subplot(2, n, i+n+1)
-        plt.title("prediction results")
+        # plt.title("prediction results")
         plt.imshow(x_pred[i][:,:,0])
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)

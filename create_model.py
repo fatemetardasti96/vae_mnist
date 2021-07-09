@@ -15,10 +15,10 @@ def sampling(args):
 
 
 
-def create_model(input_shape, filters, kernel_size, latent_dim):
+def create_model(input_shape, filters, kernel_size, latent_dim, num_layers):
     inputs = Input(shape=input_shape, name='encoder_input')
     x = inputs
-    for i in range(2):
+    for i in range(num_layers):
         filters *= 2
         x = Conv2D(filters=filters,
                 kernel_size=kernel_size,
@@ -49,7 +49,7 @@ def create_model(input_shape, filters, kernel_size, latent_dim):
     x = Reshape((shape[1], shape[2], shape[3]))(x)
 
     # use Conv2DTranspose to reverse the conv layers from the encoder
-    for i in range(2):
+    for i in range(num_layers):
         x = Conv2DTranspose(filters=filters,
                             kernel_size=kernel_size,
                             activation='relu',
