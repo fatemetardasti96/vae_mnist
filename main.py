@@ -20,7 +20,7 @@ if __name__ == '__main__':
                         help="latent dimension size")
     parser.add_argument("--batch-size", type=int, default=32,
                         help="nb batch size")
-    parser.add_argument("--nb-epohcs", type=int, default=20,
+    parser.add_argument("--nb-epochs", type=int, default=20,
                         help="nb epochs")
     parser.add_argument("--kernel-size", type=int, default=3,
                         help="kernel size")
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     kernel_size = args.kernel_size
     filters = args.filter_size
     latent_dim = args.latent_dim
-    epochs = args.nb_epochs
+    nb_epochs = args.nb_epochs
     use_mse = args.use_mse == 1
     load_weights = args.load_weights == 1
 
@@ -47,6 +47,6 @@ if __name__ == '__main__':
     input_shape = (image_size, image_size, 1)
     inputs, outputs, encoder, decoder, vae, z_mean, z_log_var = create_model(input_shape, filters, kernel_size, latent_dim)
     vae = build_model(inputs, outputs, image_size, z_mean, z_log_var, vae, use_mse)
-    fit_model(x_train, x_test, epochs, batch_size, vae, load_weights, cwd)
+    fit_model(x_train, x_test, nb_epochs, batch_size, vae, load_weights, cwd)
     plot_results(encoder, decoder, vae, x_test, y_test, batch_size, cwd)
-    generate_report(encoder, decoder, vae, batch_size, kernel_size, filters, latent_dim, epochs, use_mse, load_weights, cwd)
+    generate_report(encoder, decoder, vae, batch_size, kernel_size, filters, latent_dim, nb_epochs, use_mse, load_weights, cwd)
