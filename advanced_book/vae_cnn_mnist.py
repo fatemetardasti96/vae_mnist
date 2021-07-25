@@ -8,14 +8,15 @@ from tensorflow.keras.layers import Reshape, Conv2DTranspose
 from tensorflow.keras.models import Model
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.losses import mse, binary_crossentropy
-from tensorflow.keras.utils import plot_model
+# from tensorflow.keras.utils import plot_model
 from tensorflow.keras import backend as K
 
 import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 import os
-
+from datetime import datetime
+from pathlib import Path
 
 # reparameterization trick
 # instead of sampling from Q(z|X), sample eps = N(0,I)
@@ -39,8 +40,8 @@ def sampling(args):
 
 def plot_results(models,
                  data,
-                 batch_size=128,
-                 model_name="vae_mnist"):
+                 batch_size,
+                 cwd):
     """Plots labels and MNIST digits as function 
         of 2-dim latent vector
     # Arguments:
@@ -53,10 +54,9 @@ def plot_results(models,
     encoder, decoder = models
     x_test, y_test = data
     xmin = ymin = -4
-    xmax = ymax = +4
-    os.makedirs(model_name, exist_ok=True)
+    xmax = ymax = +4    
 
-    filename = os.path.join(model_name, "vae_mean.png")
+    filename = os.path.join(cwd, "vae_mean.png")
     # display a 2D plot of the digit classes in the latent space
     z, _, _ = encoder.predict(x_test,
                               batch_size=batch_size)
@@ -79,7 +79,7 @@ def plot_results(models,
     plt.savefig(filename)
     plt.show()
 
-    filename = os.path.join(model_name, "digits_over_latent.png")
+    filename = os.path.join(cwd, "digits_over_latent.png")
     # display a 30x30 2D manifold of digits
     n = 30
     digit_size = 28
@@ -111,10 +111,23 @@ def plot_results(models,
     plt.savefig(filename)
     plt.show()
 
+    lsv = np.random.normal(size=(10, latent_dim))
+    imgs = decoder.predict(lsv)
+    plt.figure(figsize=(25,15))
+    plt.x_ticks([],[])
+    plt.y_ticks([],[])
+    for i, img in enumerate(imgs):
+        img = img.reshape(28,28)
+        plt.subplot(10,10, i+1)
+        plt.imshow(img)
+
+    plt.savefig(cwd+'/fake_num.png')
+
 
 # MNIST dataset
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
-
+cwd = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+Path(cwd).mkdir()
 image_size = x_train.shape[1]
 x_train = np.reshape(x_train, [-1, image_size, image_size, 1])
 x_test = np.reshape(x_test, [-1, image_size, image_size, 1])
@@ -160,9 +173,9 @@ z = Lambda(sampling,
 # instantiate encoder model
 encoder = Model(inputs, [z_mean, z_log_var, z], name='encoder')
 encoder.summary()
-plot_model(encoder,
-           to_file='vae_cnn_encoder.png', 
-           show_shapes=True)
+# plot_model(encoder,
+#            to_file='vae_cnn_encoder.png', 
+#            show_shapes=True)
 
 # build decoder model
 latent_inputs = Input(shape=(latent_dim,), name='z_sampling')
@@ -187,9 +200,9 @@ outputs = Conv2DTranspose(filters=1,
 # instantiate decoder model
 decoder = Model(latent_inputs, outputs, name='decoder')
 decoder.summary()
-plot_model(decoder,
-           to_file='vae_cnn_decoder.png', 
-           show_shapes=True)
+# plot_model(decoder,
+#            to_file='vae_cnn_decoder.png', 
+#            show_shapes=True)
 
 # instantiate VAE model
 outputs = decoder(encoder(inputs)[2])
@@ -222,7 +235,7 @@ if __name__ == '__main__':
     vae.summary()
     # plot_model(vae, to_file='vae_cnn.png', show_shapes=True)
 
-    save_dir = "vae_cnn_weights"
+    save_dir = cwd
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
     if args.weights:
