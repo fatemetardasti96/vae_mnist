@@ -1,4 +1,4 @@
-def generate_report(encoder, decoder, vae, batch_size, kernel_size, filters, latent_dim, epochs, use_mse, load_weights, nb_layers, cwd):
+def generate_report(encoder, decoder, vae, batch_size, kernel_size, filters, latent_dim, epochs, use_mse, load_weights, nb_layers, annealing, klstart, kl_annealtime, cwd):
     
     with open(cwd + '/encoder_summary.txt', 'w') as f:
         encoder.summary(print_fn=lambda x: f.write(x + '\n'))
@@ -18,8 +18,11 @@ def generate_report(encoder, decoder, vae, batch_size, kernel_size, filters, lat
         epochs: {},
         nb_layers: {},
         use mse: {},
-        load weights: {}
-        """. format(batch_size, kernel_size, filters, latent_dim, epochs, nb_layers, use_mse, load_weights)
+        load weights: {},
+        annealing: {},
+        klstart: {},
+        kl annealtime: {}
+        """. format(batch_size, kernel_size, filters, latent_dim, epochs, nb_layers, use_mse, load_weights, annealing, klstart, kl_annealtime)
 
         f.write(txt)
         

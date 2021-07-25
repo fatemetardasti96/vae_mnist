@@ -64,4 +64,4 @@ if __name__ == '__main__':
     inputs, outputs, encoder, decoder, vae, z_mean, z_log_var = create_model(input_shape, filters, kernel_size, latent_dim, nb_layers)
     vae, history = build_model(x_train, inputs, outputs, image_size, z_mean, z_log_var, vae, use_mse, annealing, klstart, kl_annealtime, early_stopping, epochs, batch_size, cwd)
     plot_results(encoder, decoder, vae, x_test, y_test, batch_size, cwd)
-    generate_report(encoder, decoder, vae, batch_size, kernel_size, filters, latent_dim, nb_epochs, use_mse, load_weights, nb_layers, cwd)
+    generate_report(encoder, decoder, vae, batch_size, kernel_size, filters, latent_dim, nb_epochs, use_mse, load_weights, nb_layers, annealing, klstart, kl_annealtime, cwd)
