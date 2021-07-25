@@ -31,7 +31,7 @@ def create_model(input_shape, filters, kernel_size, latent_dim, num_layers):
 
     # generate latent vector Q(z|X)
     x = Flatten()(x)
-    x = Dense(16, activation='relu')(x)
+    x = Dense(filters, activation='relu')(x)
     z_mean = Dense(latent_dim, name='z_mean')(x)
     z_log_var = Dense(latent_dim, name='z_log_var')(x)
 
@@ -45,23 +45,23 @@ def create_model(input_shape, filters, kernel_size, latent_dim, num_layers):
 
 
     latent_inputs = Input(shape=(latent_dim,), name='z_sampling')
-    x = Dense(shape[1] * shape[2] * shape[3], activation='relu')(latent_inputs)
-    x = Reshape((shape[1], shape[2], shape[3]))(x)
+    y = Dense(shape[1] * shape[2] * shape[3], activation='relu')(latent_inputs)
+    y = Reshape((shape[1], shape[2], shape[3]))(y)
 
     # use Conv2DTranspose to reverse the conv layers from the encoder
     for i in range(num_layers):
-        x = Conv2DTranspose(filters=filters,
-                            kernel_size=kernel_size,
-                            activation='relu',
+        y = Conv2DTranspose(filters=filters,
+                            kernel_size=kernel_size,                            
                             strides=2,
-                            padding='same')(x)
-        filters //= 2
+                            padding='same',
+                            activation='relu')(y)
+        filters /= 2
 
     outputs = Conv2DTranspose(filters=1,
-                            kernel_size=kernel_size,
+                            kernel_size=1,
                             activation='sigmoid',
-                            padding='same',
-                            name='decoder_output')(x)
+                            # padding='same',
+                            name='decoder_output')(y)
 
     # instantiate decoder model
     decoder = Model(latent_inputs, outputs, name='decoder')

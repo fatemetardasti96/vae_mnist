@@ -34,6 +34,13 @@ if __name__ == '__main__':
                         help="apply early stopping or not (1/0)")
     parser.add_argument("--load-weights", type=bool, default=0,
                         help="load weights or not (1/0)")
+    parser.add_argument("--annealing", type=bool, default=1,
+                        help="apply annealing or not (1/0)")
+    parser.add_argument("--klstart", type=int, default=3,
+                        help="start kl loss")
+    parser.add_argument("--kl-annealtime", type=int, default=5,
+                        help="weight increase in every epochs")
+
     args = parser.parse_args()
     
     batch_size = args.batch_size
@@ -45,14 +52,16 @@ if __name__ == '__main__':
     use_mse = args.use_mse == 1
     early_stopping = args.early_stopping == 1
     load_weights = args.load_weights == 1
-
+    annealing = args.annealing == 1
+    klstart = args.klstart
+    kl_annealtime = args.kl_annealtime
+    
 
     cwd = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     Path(cwd).mkdir()
 
     input_shape = (image_size, image_size, 1)
     inputs, outputs, encoder, decoder, vae, z_mean, z_log_var = create_model(input_shape, filters, kernel_size, latent_dim, nb_layers)
-    vae = build_model(inputs, outputs, image_size, z_mean, z_log_var, vae, use_mse)
-    fit_model(x_train, x_test, nb_epochs, batch_size, vae, load_weights, early_stopping, cwd)
+    vae, history = build_model(x_train, inputs, outputs, image_size, z_mean, z_log_var, vae, use_mse, annealing, klstart, kl_annealtime, early_stopping, epochs, batch_size, cwd)
     plot_results(encoder, decoder, vae, x_test, y_test, batch_size, cwd)
     generate_report(encoder, decoder, vae, batch_size, kernel_size, filters, latent_dim, nb_epochs, use_mse, load_weights, nb_layers, cwd)
